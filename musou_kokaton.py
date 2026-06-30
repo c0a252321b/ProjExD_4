@@ -250,7 +250,7 @@ class Score:
     def __init__(self):
         self.font = pg.font.Font(None, 50)
         self.color = (0, 0, 255)
-        self.value = 0
+        self.value = 200
         self.image = self.font.render(f"Score: {self.value}", 0, self.color)
         self.rect = self.image.get_rect()
         self.rect.center = 100, HEIGHT-50
@@ -449,14 +449,18 @@ def main():
             score.value += 1  # 1点アップ
 
         for bomb in pg.sprite.spritecollide(bird, bombs, True):  # こうかとんと衝突した爆弾リスト
-            life.num -= 1 #残機数を１減少
-            bird.change_img(8, screen)  # こうかとん悲しみエフェクト
-            if life.num <= 0: #残機数が０になったらゲーム終了
+            
  
-                if bird.state == "hyper":
-                    exps.add(Explosion(bomb,50))
-                    score.value += 1
-                else:
+            if bomb.state == "inactive":  #EMPによって無効化されている爆弾なら、爆発せずに消滅
+                continue
+
+            if bird.state == "hyper":
+                exps.add(Explosion(bomb,50))
+                score.value += 1
+            else:
+                life.num -= 1 #残機数を１減少
+                bird.change_img(8, screen)  # こうかとん悲しみエフェクト
+                if life.num <= 0: #残機数が０になったらゲーム終了
                     bird.change_img(8, screen)  # こうかとん悲しみエフェクト
                     score.update(screen)
                     pg.display.update()
@@ -466,8 +470,7 @@ def main():
         for bomb in pg.sprite.groupcollide(bombs, shields, True, False).keys():
             exps.add(Explosion(bomb, 50))
             
-            # if bomb.state == "inactive":  #EMPによって無効化されている爆弾なら、爆発せずに消滅
-            #     continue
+            
 
             # bird.change_img(8, screen)
             # score.update(screen)
